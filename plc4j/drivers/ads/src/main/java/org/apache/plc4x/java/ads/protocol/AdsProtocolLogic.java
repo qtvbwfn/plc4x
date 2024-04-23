@@ -221,7 +221,7 @@ public class AdsProtocolLogic extends Plc4xProtocolBase<AmsTCPPacket> implements
                                                 CompletableFuture<Void> readSymbolTableFuture = readSymbolTableAndDatatypeTable(context);
                                                 readSymbolTableFuture.whenComplete((unused2, throwable2) -> {
                                                     if (throwable2 != null) {
-                                                        LOGGER.error("Error fetching symbol and datatype table sizes");
+                                                        context.getChannel().pipeline().fireExceptionCaught(new PlcConnectionException("Error fetching symbol and datatype table sizes", throwable2));
                                                     } else {
                                                         context.fireConnected();
                                                     }
@@ -1081,11 +1081,11 @@ public class AdsProtocolLogic extends Plc4xProtocolBase<AmsTCPPacket> implements
         // With multi-requests, the index-group is fixed and the index offset indicates the number of elements.
         AmsPacket amsPacket = new AdsReadWriteRequest(configuration.getTargetAmsNetId(), configuration.getTargetAmsPort(),
             configuration.getSourceAmsNetId(), configuration.getSourceAmsPort(),
-            0, getInvokeId(), ReservedIndexGroups.ADSIGRP_MULTIPLE_WRITE.getValue(), serializedSize,
+            0, getInvokeId(), ReservedIndexGroups.ADSIGRP_MULTIPLE_WRITE.getValue(), serializedTags.size(),
             (long) numTags * 4,
             directAdsTags.entrySet().stream().map(entry -> new AdsMultiRequestItemWrite(
                     entry.getKey().getIndexGroup(), entry.getKey().getIndexOffset(),
-                    entry.getValue().getEntryLength()))
+                    entry.getValue().getSize()))
                 .collect(Collectors.toList()), writeBuffer.getBytes());
         AmsTCPPacket amsTCPPacket = new AmsTCPPacket(amsPacket);
 
@@ -1144,8 +1144,9 @@ public class AdsProtocolLogic extends Plc4xProtocolBase<AmsTCPPacket> implements
                 throw new SerializationException(String.format(
                     "Expected a PlcList of size %d, but got one of size %d", curArrayLevel.getNumElements(), list.size()));
             }
+            AdsDataTypeTableEntry childDataType = dataTypeTable.get(dataType.getSimpleTypeName());
             for (PlcValue plcValue : list) {
-                serializeInternal(plcValue, dataType, arrayInfo.subList(1, arrayInfo.size()), writeBuffer);
+                serializeInternal(plcValue, childDataType, arrayInfo.subList(1, arrayInfo.size()), writeBuffer);
             }
         }
 

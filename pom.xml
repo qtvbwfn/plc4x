@@ -56,8 +56,8 @@
   </distributionManagement>
 
   <issueManagement>
-    <system>Jira</system>
-    <url>https://issues.apache.org/jira/browse/PLC4X</url>
+    <system>GitHub</system>
+    <url>https://github.com/apache/plc4x/issues</url>
   </issueManagement>
 
   <mailingLists>
@@ -107,8 +107,8 @@
     <awaitility.version>4.2.1</awaitility.version>
     <!-- The currently available version is 2.0.5 and anything above 1.4.3 is no longer compatible with our code -->
     <bit-io.version>1.4.3</bit-io.version>
-    <bouncycastle.version>1.77</bouncycastle.version>
-    <byte-buddy.version>1.14.12</byte-buddy.version>
+    <bouncycastle.version>1.78.1</bouncycastle.version>
+    <byte-buddy.version>1.14.13</byte-buddy.version>
     <!-- Be sure to keep this version set to the version of the cmake-maven-plugin -->
     <cmake-version>3.22.1</cmake-version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
@@ -116,21 +116,19 @@
     <commons-codec.version>1.16.1</commons-codec.version>
     <commons-collections4.version>4.4</commons-collections4.version>
     <commons-compress.version>1.26.1</commons-compress.version>
-    <commons-configuration2.version>2.9.0</commons-configuration2.version>
-    <commons-io.version>2.15.1</commons-io.version>
+    <commons-configuration2.version>2.10.1</commons-configuration2.version>
+    <commons-io.version>2.16.1</commons-io.version>
     <commons-lang3.version>3.14.0</commons-lang3.version>
-    <commons-logging.version>1.3.0</commons-logging.version>
+    <commons-logging.version>1.3.1</commons-logging.version>
     <commons-math3.version>3.6.1</commons-math3.version>
     <commons-net.version>3.10.0</commons-net.version>
-    <commons-pool2.version>2.12.0</commons-pool2.version>
-    <commons-text.version>1.11.0</commons-text.version>
+    <commons-text.version>1.12.0</commons-text.version>
     <commons-csv.version>1.10.0</commons-csv.version>
     <dom4j.version>2.1.4</dom4j.version>
-    <equalsverifier.version>3.15.7</equalsverifier.version>
+    <equalsverifier.version>3.16.1</equalsverifier.version>
     <freemarker.version>2.3.32</freemarker.version>
-    <groovy.version>4.0.18</groovy.version>
-    <gson.version>2.10.1</gson.version>
-    <guava.version>33.0.0-jre</guava.version>
+    <groovy.version>4.0.21</groovy.version>
+    <guava.version>33.1.0-jre</guava.version>
     <hamcrest.version>2.2</hamcrest.version>
     <httpclient.version>4.5.14</httpclient.version>
     <httpcore.version>4.4.16</httpcore.version>
@@ -141,23 +139,22 @@
     <!-- Starting with Jetty 12 Java 17 is required -->
     <jetty-util.version>11.0.20</jetty-util.version>
     <jna.version>5.14.0</jna.version>
-    <joda-time.version>2.12.7</joda-time.version>
-    <jserialcom.version>2.10.4</jserialcom.version>
+    <jserialcom.version>2.11.0</jserialcom.version>
     <junit.jupiter.version>5.10.2</junit.jupiter.version>
     <junit.platform.version>1.8.2</junit.platform.version>
-    <logback.version>1.5.3</logback.version>
+    <logback.version>1.5.6</logback.version>
     <maven.clean.plugin.version>3.2.0</maven.clean.plugin.version>
     <milo.version>0.6.12</milo.version>
-    <mockito.version>5.10.0</mockito.version>
-    <netty.version>4.1.107.Final</netty.version>
+    <mockito.version>5.11.0</mockito.version>
+    <netty.version>4.1.109.Final</netty.version>
     <pcap4j.version>1.8.2</pcap4j.version>
-    <slf4j.version>2.0.12</slf4j.version>
+    <slf4j.version>2.0.13</slf4j.version>
     <vavr.version>0.10.4</vavr.version>
     <xmlunit.version>2.9.1</xmlunit.version>
 
     <!-- Site properties -->
     <asciidoctor.maven.plugin.version>2.2.6</asciidoctor.maven.plugin.version>
-    <asciidoctorj.version>2.5.11</asciidoctorj.version>
+    <asciidoctorj.version>2.5.12</asciidoctorj.version>
     <asciidoctorj.diagram.version>2.3.0</asciidoctorj.diagram.version>
 
     <skip-code-generation>false</skip-code-generation>
@@ -271,11 +268,6 @@
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
-        <artifactId>commons-pool2</artifactId>
-        <version>${commons-pool2.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
         <artifactId>commons-text</artifactId>
         <version>${commons-text.version}</version>
       </dependency>
@@ -286,26 +278,15 @@
       </dependency>
 
       <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>${gson.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.google.googlejavaformat</groupId>
         <artifactId>google-java-format</artifactId>
-        <version>1.21.0</version>
+        <version>1.22.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility</artifactId>
         <version>${awaitility.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>${joda-time.version}</version>
       </dependency>
 
       <!-- For Either types ... -->
@@ -471,11 +452,6 @@
 
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcmail-jdk18on</artifactId>
-        <version>${bouncycastle.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
         <artifactId>bcpkix-jdk18on</artifactId>
         <version>${bouncycastle.version}</version>
       </dependency>
@@ -486,39 +462,13 @@
       </dependency>
 
       <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>${jetty-util.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.milo</groupId>
-        <artifactId>sdk-server</artifactId>
-        <version>${milo.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.milo</groupId>
-        <artifactId>sdk-core</artifactId>
-        <version>${milo.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.eclipse.milo</groupId>
         <artifactId>stack-core</artifactId>
         <version>${milo.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.milo</groupId>
-        <artifactId>stack-server</artifactId>
-        <version>${milo.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.milo</groupId>
         <artifactId>stack-client</artifactId>
-        <version>${milo.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.milo</groupId>
-        <artifactId>dictionary-manager</artifactId>
         <version>${milo.version}</version>
       </dependency>
 
@@ -572,7 +522,7 @@
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20240205</version>
+        <version>20240303</version>
       </dependency>
 
       <dependency>
@@ -623,9 +573,27 @@
       </dependency>
 
       <dependency>
+        <groupId>com.google.errorprone</groupId>
+        <artifactId>error_prone_annotations</artifactId>
+        <version>2.26.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>failureaccess</artifactId>
+        <version>1.0.2</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.j2objc</groupId>
+        <artifactId>j2objc-annotations</artifactId>
+        <version>2.8</version>
       </dependency>
 
       <dependency>
@@ -693,7 +661,7 @@
           <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>${joda-time.version}</version>
+            <version>2.12.7</version>
           </dependency>
           <dependency>
             <groupId>org.apache.groovy</groupId>
@@ -894,7 +862,7 @@
             <configuration>
               <resourceBundles>
                 <!-- Will generate META-INF/{DEPENDENCIES,LICENSE,NOTICE} -->
-                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+                <resourceBundle>org.apache.apache.resources:apache-jar-resource-bundle:1.5</resourceBundle>
               </resourceBundles>
               <!-- Content in this directory will be appended to generated resources -->
               <appendedResourcesDirectory>${basedir}/src/remote-resources</appendedResourcesDirectory>
@@ -978,7 +946,7 @@
           <dependency>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>extra-enforcer-rules</artifactId>
-            <version>1.7.0</version>
+            <version>1.8.0</version>
           </dependency>
           <dependency>
             <groupId>org.apache.maven.shared</groupId>
@@ -1080,12 +1048,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>properties-maven-plugin</artifactId>
-          <version>1.2.1</version>
-        </plugin>
-
-        <plugin>
           <groupId>org.antlr</groupId>
           <artifactId>antlr4-maven-plugin</artifactId>
           <version>${antlr.version}</version>
@@ -1095,12 +1057,6 @@
           <groupId>org.apache.plc4x.plugins</groupId>
           <artifactId>plc4x-maven-plugin</artifactId>
           <version>${plc4x-code-generation.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>3.2.0</version>
         </plugin>
 
         <plugin>
@@ -1124,13 +1080,7 @@
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-maven-plugin</artifactId>
-          <version>4.4.5</version>
-        </plugin>
-
-        <plugin>
-          <groupId>com.google.code.maven-replacer-plugin</groupId>
-          <artifactId>replacer</artifactId>
-          <version>1.5.3</version>
+          <version>4.4.6</version>
         </plugin>
 
         <plugin>
@@ -1142,25 +1092,25 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-remote-resources-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.2.0</version>
         </plugin>
 
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.8.1</version>
+          <version>1.9.0</version>
         </plugin>
 
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.11</version>
+          <version>0.8.12</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.12.1</version>
+          <version>3.13.0</version>
           <configuration>
             <!--
               Use the eclipse compiler instead of the normal jdk one, as we were seeing
@@ -1173,7 +1123,7 @@
             <dependency>
               <groupId>org.codehaus.plexus</groupId>
               <artifactId>plexus-compiler-api</artifactId>
-              <version>2.14.2</version>
+              <version>2.15.0</version>
             </dependency>
             <dependency>
               <groupId>org.codehaus.plexus</groupId>
@@ -1228,7 +1178,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.3.1</version>
           <executions>
             <execution>
               <id>attach-sources</id>
@@ -1243,7 +1193,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.7.1</version>
           <configuration>
             <finalName>apache-plc4x-${project.version}</finalName>
           </configuration>
@@ -1360,12 +1310,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-changelog-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-
-        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.2.0</version>
@@ -1398,7 +1342,7 @@
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
-          <version>3.10.0.2594</version>
+          <version>3.11.0.3922</version>
         </plugin>
 
         <plugin>
@@ -1417,87 +1361,6 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <reporting>
-    <plugins>
-      <!-- Generate the unit- and integration-test reports -->
-      <!--plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>report-only</report>
-              <report>failsafe-report-only</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin-->
-
-      <!-- Generate a code coverage report -->
-      <!--plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>report</report>
-              <report>report-integration</report>
-            </reports>
-          </reportSet>
-          <reportSet>
-            <id>aggregate</id>
-            <inherited>false</inherited>
-            <reports>
-              <report>report-aggregate</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin-->
-
-      <!-- Add html friendly version of source files with line-numbers -->
-      <!--plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>3.0.0</version>
-      </plugin-->
-
-      <!-- Generate javadoc documentation -->
-      <!--plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>javadoc-no-fork</report>
-              <report>test-javadoc-no-fork</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-        <configuration>
-          <failOnError>true</failOnError>
-        </configuration>
-      </plugin-->
-
-      <!-- Generates a changelog report from GIT commits -->
-      <!--plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-changelog-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>changelog</report>
-              <report>file-activity</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-        <configuration>
-          <!- Automatically link Jira issues ->
-          <issueLinkUrl>https://issues.apache.org/jira/browse/%ISSUE%</issueLinkUrl>
-        </configuration>
-      </plugin-->
-    </plugins>
-  </reporting>
 
   <!-- Make Snapshots of Apache projects available -->
   <repositories>
@@ -1935,7 +1798,7 @@
           <plugin>
             <groupId>org.cyclonedx</groupId>
             <artifactId>cyclonedx-maven-plugin</artifactId>
-            <version>2.7.11</version>
+            <version>2.8.0</version>
             <!-- Only run this in the root module of the project -->
             <inherited>false</inherited>
             <configuration>

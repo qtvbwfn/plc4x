@@ -47,7 +47,8 @@ public class ModbusRtuProtocolLogic extends ModbusProtocolLogic<ModbusRtuADU> im
     @Override
     public void setConfiguration(ModbusRtuConfiguration configuration) {
         this.requestTimeout = Duration.ofMillis(configuration.getRequestTimeout());
-        this.unitIdentifier = (short) configuration.getUnitIdentifier();
+        this.unitIdentifier = (short) configuration.getDefaultUnitIdentifier();
+        this.defaultPayloadByteOrder = configuration.getDefaultPayloadByteOrder();
         this.tm = new RequestTransactionManager(1);
     }
 
@@ -64,7 +65,8 @@ public class ModbusRtuProtocolLogic extends ModbusProtocolLogic<ModbusRtuADU> im
         // So we fall back to a request, that most certainly is implemented by any device. Even if the device doesn't
         // have any holding-register:1, it should still gracefully respond.
         ModbusPDU readRequestPdu = getReadRequestPdu(pingAddress);
-        ModbusRtuADU modbusRtuADU = new ModbusRtuADU(unitIdentifier, readRequestPdu);
+        final short unitId = getUnitId(pingAddress);
+        ModbusRtuADU modbusRtuADU = new ModbusRtuADU(unitId, readRequestPdu);
 
         RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
         transaction.submit(() -> context.sendRequest(modbusRtuADU)
@@ -99,8 +101,9 @@ public class ModbusRtuProtocolLogic extends ModbusProtocolLogic<ModbusRtuADU> im
             String tagName = request.getTagNames().iterator().next();
             ModbusTag tag = (ModbusTag) request.getTag(tagName);
             final ModbusPDU requestPdu = getReadRequestPdu(tag);
+            final short unitId = getUnitId(tag);
 
-            ModbusRtuADU modbusRtuADU = new ModbusRtuADU(unitIdentifier, requestPdu);
+            ModbusRtuADU modbusRtuADU = new ModbusRtuADU(unitId, requestPdu);
             RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
             transaction.submit(() -> context.sendRequest(modbusRtuADU)
                 .expectResponse(ModbusRtuADU.class, requestTimeout)
@@ -158,7 +161,8 @@ public class ModbusRtuProtocolLogic extends ModbusProtocolLogic<ModbusRtuADU> im
             String tagName = request.getTagNames().iterator().next();
             PlcTag tag = request.getTag(tagName);
             final ModbusPDU requestPdu = getWriteRequestPdu(tag, writeRequest.getPlcValue(tagName));
-            ModbusRtuADU modbusRtuADU = new ModbusRtuADU(unitIdentifier, requestPdu);
+            final short unitId = getUnitId(tag);
+            ModbusRtuADU modbusRtuADU = new ModbusRtuADU(unitId, requestPdu);
             RequestTransactionManager.RequestTransaction transaction = tm.startRequest();
             transaction.submit(() -> context.sendRequest(modbusRtuADU)
                 .expectResponse(ModbusRtuADU.class, requestTimeout)

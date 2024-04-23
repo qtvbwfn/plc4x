@@ -35,4 +35,5 @@ class Plc4xBaseProtocol(Protocol):
 
     def connection_lost(self, exc: Union[Exception, None]) -> None:
         self.connected = False
-        raise ConnectionError
+        if exc is not None:
+            raise ConnectionError

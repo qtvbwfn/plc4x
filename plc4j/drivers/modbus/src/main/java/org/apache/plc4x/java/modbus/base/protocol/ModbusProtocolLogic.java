@@ -19,9 +19,6 @@
 package org.apache.plc4x.java.modbus.base.protocol;
 
 import org.apache.plc4x.java.api.exceptions.PlcRuntimeException;
-import org.apache.plc4x.java.api.messages.PlcPingRequest;
-import org.apache.plc4x.java.api.messages.PlcPingResponse;
-import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.model.PlcTag;
 import org.apache.plc4x.java.api.value.*;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
@@ -40,7 +37,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProtocolBase<T> {
@@ -49,6 +45,7 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
     protected Duration requestTimeout;
     protected short unitIdentifier;
     protected PlcTag pingAddress;
+    protected ByteOrder defaultPayloadByteOrder;
 
     protected RequestTransactionManager tm;
     protected final AtomicInteger transactionIdentifierGenerator = new AtomicInteger(1);
@@ -95,6 +92,15 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
                 // This generally implies that something went wrong which we didn't anticipate.
                 return PlcResponseCode.INTERNAL_ERROR;
         }
+    }
+
+    protected short getUnitId(PlcTag tag) {
+        if (tag instanceof ModbusTag) {
+            Short unitId = ((ModbusTag) tag).getUnitId();
+            return unitId == null ? unitIdentifier : unitId;
+        }
+
+        return unitIdentifier;
     }
 
     protected ModbusPDU getReadRequestPdu(PlcTag tag) {
@@ -228,11 +234,11 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
             }
             ModbusPDUReadInputRegistersRequest req = (ModbusPDUReadInputRegistersRequest) request;
             ModbusPDUReadInputRegistersResponse resp = (ModbusPDUReadInputRegistersResponse) response;
-            ReadBuffer io = new ReadBufferByteBased(resp.getValue());
+            ReadBuffer io = new ReadBufferByteBased(resp.getValue(), defaultPayloadByteOrder);
             if (tagDataTypeSize < 2) {
                 io.readByte();
             }
-            return DataItem.staticParse(io, dataType, Math.max(Math.round(req.getQuantity() / (tagDataTypeSize / 2.0f)), 1));
+            return DataItem.staticParse(io, dataType, Math.max(Math.round(req.getQuantity() / (tagDataTypeSize / 2.0f)), 1), defaultPayloadByteOrder == ByteOrder.BIG_ENDIAN);
         } else if (request instanceof ModbusPDUReadHoldingRegistersRequest) {
             if (!(response instanceof ModbusPDUReadHoldingRegistersResponse)) {
                 throw new PlcRuntimeException("Unexpected response type. " +
@@ -240,11 +246,11 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
             }
             ModbusPDUReadHoldingRegistersRequest req = (ModbusPDUReadHoldingRegistersRequest) request;
             ModbusPDUReadHoldingRegistersResponse resp = (ModbusPDUReadHoldingRegistersResponse) response;
-            ReadBuffer io = new ReadBufferByteBased(resp.getValue());
+            ReadBuffer io = new ReadBufferByteBased(resp.getValue(), defaultPayloadByteOrder);
             if ((dataType != ModbusDataType.STRING) && tagDataTypeSize < 2) {
                 io.readByte();
             }
-            return DataItem.staticParse(io, dataType, Math.max(Math.round(req.getQuantity() / (tagDataTypeSize / 2.0f)), 1));
+            return DataItem.staticParse(io, dataType, Math.max(Math.round(req.getQuantity() / (tagDataTypeSize / 2.0f)), 1), defaultPayloadByteOrder == ByteOrder.BIG_ENDIAN);
         } else if (request instanceof ModbusPDUReadFileRecordRequest) {
             if (!(response instanceof ModbusPDUReadFileRecordResponse)) {
                 throw new PlcRuntimeException("Unexpected response type. " +
@@ -257,11 +263,11 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
 
             if (resp.getItems().size() == 2 && resp.getItems().size() == req.getItems().size()) {
                 //If request was split over file records, two groups in response should be received.
-                io = new ReadBufferByteBased(ArrayUtils.addAll(resp.getItems().get(0).getData(), resp.getItems().get(1).getData()));
+                io = new ReadBufferByteBased(ArrayUtils.addAll(resp.getItems().get(0).getData(), resp.getItems().get(1).getData()), defaultPayloadByteOrder);
                 dataLength = (short) (resp.getItems().get(0).getLengthInBytes() + resp.getItems().get(1).getLengthInBytes() - (2 * FC_EXTENDED_REGISTERS_GROUP_HEADER_LENGTH));
             } else if (resp.getItems().size() == 1 && resp.getItems().size() == req.getItems().size()) {
                 //If request was within a single file record, one group should be received.
-                io = new ReadBufferByteBased(resp.getItems().get(0).getData());
+                io = new ReadBufferByteBased(resp.getItems().get(0).getData(), defaultPayloadByteOrder);
                 dataLength = (short) (resp.getItems().get(0).getLengthInBytes() - FC_EXTENDED_REGISTERS_GROUP_HEADER_LENGTH);
             } else {
                 throw new PlcRuntimeException("Unexpected number of groups in response. " +
@@ -270,7 +276,7 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
             if (tagDataTypeSize < 2) {
                 io.readByte();
             }
-            return DataItem.staticParse(io, dataType, Math.round(Math.max(dataLength / 2.0f, 1) / Math.max(tagDataTypeSize / 2.0f, 1)));
+            return DataItem.staticParse(io, dataType, Math.round(Math.max(dataLength / 2.0f, 1) / Math.max(tagDataTypeSize / 2.0f, 1)), defaultPayloadByteOrder == ByteOrder.BIG_ENDIAN);
         }
         return null;
     }
@@ -287,7 +293,7 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
                 // If it's a List, convert the booleans in the list into an array of bytes.
                 else if(plcValue instanceof PlcList) {
                     PlcList valueList = (PlcList) plcValue;
-                    WriteBufferByteBased wb = new WriteBufferByteBased(((plcValue.getLength() - 1) / 8) + 1);
+                    WriteBufferByteBased wb = new WriteBufferByteBased(((plcValue.getLength() - 1) / 8) + 1, defaultPayloadByteOrder);
                     int paddingBits = 8 - (plcValue.getLength() % 8);
                     if(paddingBits < 8) {
                         for(int i = 0; i < paddingBits; i++) {
@@ -313,8 +319,8 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
                }
             }
             else if (plcValue instanceof PlcList) {
-                WriteBufferByteBased writeBuffer = new WriteBufferByteBased(DataItem.getLengthInBytes(plcValue, tagDataType, plcValue.getLength()));
-                DataItem.staticSerialize(writeBuffer, plcValue, tagDataType, plcValue.getLength(), ByteOrder.BIG_ENDIAN);
+                WriteBufferByteBased writeBuffer = new WriteBufferByteBased(DataItem.getLengthInBytes(plcValue, tagDataType, plcValue.getLength(), defaultPayloadByteOrder == ByteOrder.BIG_ENDIAN), defaultPayloadByteOrder);
+                DataItem.staticSerialize(writeBuffer, plcValue, tagDataType, plcValue.getLength(), defaultPayloadByteOrder == ByteOrder.BIG_ENDIAN);
                 byte[] data = writeBuffer.getBytes();
                 if (((ModbusTag) tag).getDataType() == ModbusDataType.BOOL) {
                     //Reverse Bits in each byte as
@@ -327,8 +333,8 @@ public abstract class ModbusProtocolLogic<T extends ModbusADU> extends Plc4xProt
                 }
                 return data;
             } else {
-                WriteBufferByteBased writeBuffer = new WriteBufferByteBased(DataItem.getLengthInBytes(plcValue, tagDataType, plcValue.getLength()));
-                DataItem.staticSerialize(writeBuffer, plcValue, tagDataType, plcValue.getLength(), ByteOrder.BIG_ENDIAN);
+                WriteBufferByteBased writeBuffer = new WriteBufferByteBased(DataItem.getLengthInBytes(plcValue, tagDataType, plcValue.getLength(), defaultPayloadByteOrder == ByteOrder.BIG_ENDIAN), defaultPayloadByteOrder);
+                DataItem.staticSerialize(writeBuffer, plcValue, tagDataType, plcValue.getLength(), defaultPayloadByteOrder == ByteOrder.BIG_ENDIAN);
                 return writeBuffer.getBytes();
             }
         } catch (SerializationException e) {

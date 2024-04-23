@@ -494,7 +494,7 @@ const (
 	KnxManufacturer_M_ONEHOME                                            KnxManufacturer = 448
 	KnxManufacturer_M_EOS_SAUNATECHNIK_GMBH                              KnxManufacturer = 449
 	KnxManufacturer_M_KUSATEK_GMBH                                       KnxManufacturer = 450
-	KnxManufacturer_M_EISBAER_SCADA                                      KnxManufacturer = 451
+	KnxManufacturer_M_ALEXANDER_MAIER_GMBH                               KnxManufacturer = 451
 	KnxManufacturer_M_AUTOMATISMI_BENINCA_S_P_A_                         KnxManufacturer = 452
 	KnxManufacturer_M_BLENDOM                                            KnxManufacturer = 453
 	KnxManufacturer_M_MADEL_AIR_TECHNICAL_DIFFUSION                      KnxManufacturer = 454
@@ -547,7 +547,7 @@ const (
 	KnxManufacturer_M_AUTOMATIONPlus                                     KnxManufacturer = 501
 	KnxManufacturer_M_BLUE_AND_RED                                       KnxManufacturer = 502
 	KnxManufacturer_M_FROGBLUE                                           KnxManufacturer = 503
-	KnxManufacturer_M_SAVESOR                                            KnxManufacturer = 504
+	KnxManufacturer_M_LUXIO                                              KnxManufacturer = 504
 	KnxManufacturer_M_APP_TECH                                           KnxManufacturer = 505
 	KnxManufacturer_M_SENSORTEC_AG                                       KnxManufacturer = 506
 	KnxManufacturer_M_NYSA_TECHNOLOGY_AND_SOLUTIONS                      KnxManufacturer = 507
@@ -714,8 +714,11 @@ const (
 	KnxManufacturer_M_MUTLUSAN_ELECTRIC                                  KnxManufacturer = 668
 	KnxManufacturer_M_HANGZHOU_BROADLINK_TECHNOLOGY_CO__LTD_             KnxManufacturer = 669
 	KnxManufacturer_M_MARLEY_DEUTSCHLAND_GMBH                            KnxManufacturer = 670
-	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 671
-	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 672
+	KnxManufacturer_M_CREATROL                                           KnxManufacturer = 671
+	KnxManufacturer_M_EUTELSAT                                           KnxManufacturer = 672
+	KnxManufacturer_M_TECNIKABEL                                         KnxManufacturer = 673
+	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 674
+	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 675
 )
 
 var KnxManufacturerValues []KnxManufacturer
@@ -1174,7 +1177,7 @@ func init() {
 		KnxManufacturer_M_ONEHOME,
 		KnxManufacturer_M_EOS_SAUNATECHNIK_GMBH,
 		KnxManufacturer_M_KUSATEK_GMBH,
-		KnxManufacturer_M_EISBAER_SCADA,
+		KnxManufacturer_M_ALEXANDER_MAIER_GMBH,
 		KnxManufacturer_M_AUTOMATISMI_BENINCA_S_P_A_,
 		KnxManufacturer_M_BLENDOM,
 		KnxManufacturer_M_MADEL_AIR_TECHNICAL_DIFFUSION,
@@ -1227,7 +1230,7 @@ func init() {
 		KnxManufacturer_M_AUTOMATIONPlus,
 		KnxManufacturer_M_BLUE_AND_RED,
 		KnxManufacturer_M_FROGBLUE,
-		KnxManufacturer_M_SAVESOR,
+		KnxManufacturer_M_LUXIO,
 		KnxManufacturer_M_APP_TECH,
 		KnxManufacturer_M_SENSORTEC_AG,
 		KnxManufacturer_M_NYSA_TECHNOLOGY_AND_SOLUTIONS,
@@ -1394,6 +1397,9 @@ func init() {
 		KnxManufacturer_M_MUTLUSAN_ELECTRIC,
 		KnxManufacturer_M_HANGZHOU_BROADLINK_TECHNOLOGY_CO__LTD_,
 		KnxManufacturer_M_MARLEY_DEUTSCHLAND_GMBH,
+		KnxManufacturer_M_CREATROL,
+		KnxManufacturer_M_EUTELSAT,
+		KnxManufacturer_M_TECNIKABEL,
 		KnxManufacturer_M_ABB___RESERVED,
 		KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED,
 	}
@@ -3947,10 +3953,22 @@ func (e KnxManufacturer) Number() uint16 {
 		}
 	case 671:
 		{ /* '671' */
-			return 43954
+			return 729
 		}
 	case 672:
 		{ /* '672' */
+			return 730
+		}
+	case 673:
+		{ /* '673' */
+			return 731
+		}
+	case 674:
+		{ /* '674' */
+			return 43954
+		}
+	case 675:
+		{ /* '675' */
 			return 43959
 		}
 	case 68:
@@ -5681,7 +5699,7 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 451:
 		{ /* '451' */
-			return "EisBär Scada"
+			return "Alexander Maier GmbH"
 		}
 	case 452:
 		{ /* '452' */
@@ -5917,7 +5935,7 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 504:
 		{ /* '504' */
-			return "SAVESOR"
+			return "LUXIO"
 		}
 	case 505:
 		{ /* '505' */
@@ -6657,10 +6675,22 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 671:
 		{ /* '671' */
-			return "ABB - reserved"
+			return "Creatrol"
 		}
 	case 672:
 		{ /* '672' */
+			return "EUTELSAT"
+		}
+	case 673:
+		{ /* '673' */
+			return "TECNIKABEL"
+		}
+	case 674:
+		{ /* '674' */
+			return "ABB - reserved"
+		}
+	case 675:
+		{ /* '675' */
 			return "Busch-Jaeger Elektro - reserved"
 		}
 	case 68:
@@ -7605,7 +7635,7 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 450:
 		return KnxManufacturer_M_KUSATEK_GMBH, true
 	case 451:
-		return KnxManufacturer_M_EISBAER_SCADA, true
+		return KnxManufacturer_M_ALEXANDER_MAIER_GMBH, true
 	case 452:
 		return KnxManufacturer_M_AUTOMATISMI_BENINCA_S_P_A_, true
 	case 453:
@@ -7723,7 +7753,7 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 503:
 		return KnxManufacturer_M_FROGBLUE, true
 	case 504:
-		return KnxManufacturer_M_SAVESOR, true
+		return KnxManufacturer_M_LUXIO, true
 	case 505:
 		return KnxManufacturer_M_APP_TECH, true
 	case 506:
@@ -8093,8 +8123,14 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 670:
 		return KnxManufacturer_M_MARLEY_DEUTSCHLAND_GMBH, true
 	case 671:
-		return KnxManufacturer_M_ABB___RESERVED, true
+		return KnxManufacturer_M_CREATROL, true
 	case 672:
+		return KnxManufacturer_M_EUTELSAT, true
+	case 673:
+		return KnxManufacturer_M_TECNIKABEL, true
+	case 674:
+		return KnxManufacturer_M_ABB___RESERVED, true
+	case 675:
 		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
 	case 68:
 		return KnxManufacturer_M_WAREMA_RENKHOFF_SE, true
@@ -8956,8 +8992,8 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_WINKHAUS, true
 	case "M_KUSATEK_GMBH":
 		return KnxManufacturer_M_KUSATEK_GMBH, true
-	case "M_EISBAER_SCADA":
-		return KnxManufacturer_M_EISBAER_SCADA, true
+	case "M_ALEXANDER_MAIER_GMBH":
+		return KnxManufacturer_M_ALEXANDER_MAIER_GMBH, true
 	case "M_AUTOMATISMI_BENINCA_S_P_A_":
 		return KnxManufacturer_M_AUTOMATISMI_BENINCA_S_P_A_, true
 	case "M_BLENDOM":
@@ -9074,8 +9110,8 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_BLUE_AND_RED, true
 	case "M_FROGBLUE":
 		return KnxManufacturer_M_FROGBLUE, true
-	case "M_SAVESOR":
-		return KnxManufacturer_M_SAVESOR, true
+	case "M_LUXIO":
+		return KnxManufacturer_M_LUXIO, true
 	case "M_APP_TECH":
 		return KnxManufacturer_M_APP_TECH, true
 	case "M_SENSORTEC_AG":
@@ -9444,6 +9480,12 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_EIBMARKT_GMBH, true
 	case "M_MARLEY_DEUTSCHLAND_GMBH":
 		return KnxManufacturer_M_MARLEY_DEUTSCHLAND_GMBH, true
+	case "M_CREATROL":
+		return KnxManufacturer_M_CREATROL, true
+	case "M_EUTELSAT":
+		return KnxManufacturer_M_EUTELSAT, true
+	case "M_TECNIKABEL":
+		return KnxManufacturer_M_TECNIKABEL, true
 	case "M_ABB___RESERVED":
 		return KnxManufacturer_M_ABB___RESERVED, true
 	case "M_BUSCH_JAEGER_ELEKTRO___RESERVED":
@@ -10369,8 +10411,8 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_WINKHAUS"
 	case KnxManufacturer_M_KUSATEK_GMBH:
 		return "M_KUSATEK_GMBH"
-	case KnxManufacturer_M_EISBAER_SCADA:
-		return "M_EISBAER_SCADA"
+	case KnxManufacturer_M_ALEXANDER_MAIER_GMBH:
+		return "M_ALEXANDER_MAIER_GMBH"
 	case KnxManufacturer_M_AUTOMATISMI_BENINCA_S_P_A_:
 		return "M_AUTOMATISMI_BENINCA_S_P_A_"
 	case KnxManufacturer_M_BLENDOM:
@@ -10487,8 +10529,8 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_BLUE_AND_RED"
 	case KnxManufacturer_M_FROGBLUE:
 		return "M_FROGBLUE"
-	case KnxManufacturer_M_SAVESOR:
-		return "M_SAVESOR"
+	case KnxManufacturer_M_LUXIO:
+		return "M_LUXIO"
 	case KnxManufacturer_M_APP_TECH:
 		return "M_APP_TECH"
 	case KnxManufacturer_M_SENSORTEC_AG:
@@ -10857,6 +10899,12 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_EIBMARKT_GMBH"
 	case KnxManufacturer_M_MARLEY_DEUTSCHLAND_GMBH:
 		return "M_MARLEY_DEUTSCHLAND_GMBH"
+	case KnxManufacturer_M_CREATROL:
+		return "M_CREATROL"
+	case KnxManufacturer_M_EUTELSAT:
+		return "M_EUTELSAT"
+	case KnxManufacturer_M_TECNIKABEL:
+		return "M_TECNIKABEL"
 	case KnxManufacturer_M_ABB___RESERVED:
 		return "M_ABB___RESERVED"
 	case KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED:

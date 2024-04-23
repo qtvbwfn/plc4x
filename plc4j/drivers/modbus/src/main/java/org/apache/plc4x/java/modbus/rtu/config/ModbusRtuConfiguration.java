@@ -21,7 +21,10 @@ package org.apache.plc4x.java.modbus.rtu.config;
 import org.apache.plc4x.java.spi.configuration.PlcConnectionConfiguration;
 import org.apache.plc4x.java.spi.configuration.annotations.ConfigurationParameter;
 import org.apache.plc4x.java.spi.configuration.annotations.Description;
+import org.apache.plc4x.java.spi.configuration.annotations.Since;
 import org.apache.plc4x.java.spi.configuration.annotations.defaults.IntDefaultValue;
+import org.apache.plc4x.java.spi.configuration.annotations.defaults.StringDefaultValue;
+import org.apache.plc4x.java.spi.generation.ByteOrder;
 
 public class ModbusRtuConfiguration implements PlcConnectionConfiguration {
 
@@ -30,10 +33,20 @@ public class ModbusRtuConfiguration implements PlcConnectionConfiguration {
     @Description("Default timeout for all types of requests.")
     private int requestTimeout;
 
-    @ConfigurationParameter("unit-identifier")
+    @ConfigurationParameter("default-unit-identifier")
     @IntDefaultValue(1)
     @Description("Unit-identifier or slave-id that identifies the target PLC (On RS485 multiple Modbus Devices can be listening). Defaults to 1.")
-    private int unitIdentifier;
+    @Since("renamed from 'unit-identifier' in 0.13.0")
+    private int defaultUnitIdentifier;
+
+    @ConfigurationParameter("default-payload-byte-order")
+    @StringDefaultValue("BIG_ENDIAN")
+    @Description("Default encoding used for transporting register values (Defaults to BIG_ENDIAN).\n" +
+        "Allowed values are: \n" +
+        " - BIG_ENDIAN\n" +
+        " - LITTLE_ENDIAN")
+    @Since("0.13.0")
+    private ByteOrder defaultPayloadByteOrder;
 
     public int getRequestTimeout() {
         return requestTimeout;
@@ -43,19 +56,28 @@ public class ModbusRtuConfiguration implements PlcConnectionConfiguration {
         this.requestTimeout = requestTimeout;
     }
 
-    public int getUnitIdentifier() {
-        return unitIdentifier;
+    public int getDefaultUnitIdentifier() {
+        return defaultUnitIdentifier;
     }
 
-    public void setUnitIdentifier(int unitIdentifier) {
-        this.unitIdentifier = unitIdentifier;
+    public void setDefaultUnitIdentifier(int defaultUnitIdentifier) {
+        this.defaultUnitIdentifier = defaultUnitIdentifier;
+    }
+
+    public ByteOrder getDefaultPayloadByteOrder() {
+        return defaultPayloadByteOrder;
+    }
+
+    public void setDefaultPayloadByteOrder(ByteOrder defaultPayloadByteOrder) {
+        this.defaultPayloadByteOrder = defaultPayloadByteOrder;
     }
 
     @Override
     public String toString() {
         return "ModbusRtuConfiguration{" +
             "requestTimeout=" + requestTimeout +
-            ", unitIdentifier=" + unitIdentifier +
+            ", unitIdentifier=" + defaultUnitIdentifier +
+            ", defaultPayloadByteOrder=" + defaultPayloadByteOrder +
             '}';
     }
 
