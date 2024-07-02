@@ -52,7 +52,6 @@ import java.util.concurrent.*;
 import org.apache.plc4x.java.api.exceptions.PlcUnsupportedOperationException;
 import org.apache.plc4x.java.api.messages.PlcSubscriptionRequest;
 import org.apache.plc4x.java.s7.readwrite.utils.S7PlcSubscriptionRequest;
-import org.apache.plc4x.java.spi.messages.DefaultPlcSubscriptionRequest;
 
 /**
  * This object generates the main connection and includes the management
@@ -150,7 +149,7 @@ public class S7HPlcConnection extends DefaultNettyPlcConnection implements Runna
                         sessionDisconnectCompleteFuture,
                         sessionDiscoveredCompleteFuture));
 
-                channel.pipeline().addFirst(new LoggingHandler("DOOM"));
+                //channel.pipeline().addFirst(new LoggingHandler("DOOM"));
                 channel.pipeline().addFirst("Multiplexor", s7hmux);
             }
 

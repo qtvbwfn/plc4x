@@ -16,11 +16,13 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-
-from typing import Awaitable
+import asyncio
+import logging
+from abc import abstractmethod
 
 from plc4py.api.messages.PlcRequest import PlcReadRequest
 from plc4py.api.messages.PlcResponse import PlcReadResponse
+from plc4py.api.value.PlcValue import PlcResponseCode
 
 
 class PlcReader:
@@ -28,10 +30,70 @@ class PlcReader:
     Interface implemented by all PlcConnections that are able to read from remote resources.
     """
 
-    def _read(self, request: PlcReadRequest) -> Awaitable[PlcReadResponse]:
+    @abstractmethod
+    async def _read(self, request: PlcReadRequest) -> PlcReadResponse:
         """
-        Reads a requested value from a PLC
+        Executes a PlcReadRequest
 
-        :param request: object describing the type and location of the value
-        :return: Future, giving async access to the returned value
+        This method sends a read request to the connected device and waits for a response.
+        The response is then returned as a PlcReadResponse.
+
+        If no device is set, an error is logged and a PlcResponseCode.NOT_CONNECTED is returned.
+        If an error occurs during the execution of the read request, a PlcResponseCode.INTERNAL_ERROR is
+        returned.
+
+        :param request: PlcReadRequest to execute
+        :return: PlcReadResponse
         """
+        pass
+
+    @abstractmethod
+    def is_read_supported(self) -> bool:
+        """
+        Indicates if the connection supports read requests.
+        :return: True if connection supports reading, False otherwise
+        """
+        pass
+
+
+class DefaultPlcReader(PlcReader):
+    """
+    Interface implemented by all PlcConnections that are able to read from remote resources.
+    """
+
+    def __init__(self):
+        self._transport = None
+        self._device = None
+
+    async def _read(self, request: PlcReadRequest) -> PlcReadResponse:
+        """
+        Executes a PlcReadRequest
+
+        This method sends a read request to the connected device and waits for a response.
+        The response is then returned as a PlcReadResponse.
+
+        If no device is set, an error is logged and a PlcResponseCode.NOT_CONNECTED is returned.
+        If an error occurs during the execution of the read request, a PlcResponseCode.INTERNAL_ERROR is
+        returned.
+
+        :param request: PlcReadRequest to execute
+        :return: PlcReadResponse
+        """
+
+        # TODO: Insert Optimizer base on data from a browse request
+        try:
+            logging.debug("Sending read request to Device")
+            response = await asyncio.wait_for(
+                self._device.read(request, self._transport), 10
+            )
+            return response
+        except Exception:
+            # TODO:- This exception is very general and probably should be replaced
+            return PlcReadResponse(PlcResponseCode.INTERNAL_ERROR, {})
+
+    def is_read_supported(self) -> bool:
+        """
+        Indicates if the connection supports read requests.
+        :return: True if connection supports reading, False otherwise
+        """
+        return True

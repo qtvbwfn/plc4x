@@ -17,63 +17,65 @@
 # under the License.
 #
 
-import asyncio
 import logging
+from asyncio import Transport
 from dataclasses import dataclass, field
-from typing import Awaitable, Type, List, Dict
-
-from plc4py.spi.messages.PlcWriter import PlcWriter
-
-from plc4py.drivers.mock import MockTag
-from plc4py.drivers.mock.MockTag import MockTagBuilder
-from plc4py.spi.messages.PlcRequest import DefaultReadRequestBuilder
+from typing import Type, Union
 
 import plc4py
-
 from plc4py.api.PlcConnection import PlcConnection, PlcConnectionMetaData
 from plc4py.api.PlcDriver import PlcDriver
 from plc4py.api.authentication.PlcAuthentication import PlcAuthentication
 from plc4py.api.exceptions.exceptions import PlcFieldParseException
-from plc4py.api.messages.PlcField import PlcTag
 from plc4py.api.messages.PlcRequest import (
     ReadRequestBuilder,
     PlcReadRequest,
     PlcRequest,
-    PlcWriteRequest,
 )
 from plc4py.api.messages.PlcResponse import (
     PlcReadResponse,
     PlcResponse,
-    PlcWriteResponse,
 )
-from plc4py.api.value.PlcValue import PlcResponseCode, PlcValue
+from plc4py.api.value.PlcValue import PlcResponseCode
 from plc4py.drivers.PlcDriverLoader import PlcDriverLoader
-from plc4py.spi.messages.PlcReader import PlcReader
+from plc4py.drivers.mock.MockTag import MockTagBuilder
+from plc4py.spi.messages.PlcReader import DefaultPlcReader
+from plc4py.spi.messages.PlcRequest import DefaultReadRequestBuilder
+from plc4py.spi.messages.PlcWriter import DefaultPlcWriter
 from plc4py.spi.messages.utils.ResponseItem import ResponseItem
+from plc4py.spi.transport.MockTransport import MockTransport
+from plc4py.spi.transport.Plc4xBaseTransport import Plc4xBaseTransport
 from plc4py.spi.values.PlcValues import PlcBOOL
 from plc4py.spi.values.PlcValues import PlcINT
 
 
 @dataclass
 class MockDevice:
-    def read(self, tag: MockTag) -> ResponseItem[PlcValue]:
+    async def read(
+        self, request: PlcReadRequest, transport: Transport
+    ) -> PlcReadResponse:
         """
         Reads one field from the Mock Device
         """
-        logging.debug(f"Reading field {str(tag)} from Mock Device")
+        response_items = {}
+        for tag_name, tag in request.tags.items():
+            logging.debug(f"Reading field {str(tag)} from Mock Device")
 
-        if tag.data_type == "BOOL":
-            return ResponseItem(PlcResponseCode.OK, PlcBOOL(False))
-        elif tag.data_type == "INT":
-            return ResponseItem(PlcResponseCode.OK, PlcINT(0))
-        else:
-            raise PlcFieldParseException
+            if tag.data_type == "BOOL":
+                response_items[tag_name] = ResponseItem(
+                    PlcResponseCode.OK, PlcBOOL(False)
+                )
+            elif tag.data_type == "INT":
+                response_items[tag_name] = ResponseItem(PlcResponseCode.OK, PlcINT(0))
+            else:
+                raise PlcFieldParseException
+        return PlcReadResponse(PlcResponseCode.OK, response_items)
 
 
 @dataclass
-class MockConnection(PlcConnection, PlcReader, PlcWriter, PlcConnectionMetaData):
-    _is_connected: bool = False
-    device: MockDevice = field(default_factory=lambda: MockDevice())
+class MockConnection(PlcConnection, DefaultPlcReader, DefaultPlcWriter):
+    _device: MockDevice = field(default_factory=lambda: MockDevice())
+    _transport: Union[Plc4xBaseTransport, None] = None
 
     def _connect(self):
         """
@@ -86,22 +88,9 @@ class MockConnection(PlcConnection, PlcReader, PlcWriter, PlcConnectionMetaData)
     async def create(url):
         # config = PlcConfiguration(url)
         connection = MockConnection()
+        connection._transport = await MockTransport.create(None, None, None)
         connection._connect()
         return connection
-
-    def is_connected(self) -> bool:
-        """
-        Return the current status of the Mock PLC Connection
-        :return bool: True is connected
-        """
-        return self._is_connected
-
-    def close(self) -> None:
-        """
-        Closes the connection to the remote PLC.
-        :return:
-        """
-        self._is_connected = False
 
     def read_request_builder(self) -> ReadRequestBuilder:
         """
@@ -122,78 +111,6 @@ class MockConnection(PlcConnection, PlcReader, PlcWriter, PlcConnectionMetaData)
             return await self._read(request)
 
         return self._default_failed_request(PlcResponseCode.NOT_CONNECTED)
-
-    async def _read(self, request: PlcReadRequest) -> PlcReadResponse:
-        """
-        Executes a PlcReadRequest
-        """
-        if self.device is None:
-            logging.error("No device is set in the mock connection!")
-            return self._default_failed_request(PlcResponseCode.NOT_CONNECTED)
-
-        try:
-            logging.debug("Sending read request to Mock Device")
-            response = PlcReadResponse(
-                PlcResponseCode.OK,
-                {
-                    tag_name: self.device.read(tag)
-                    for tag_name, tag in request.tags.items()
-                },
-            )
-            return response
-        except Exception as e:
-            # TODO:- This exception is very general and probably should be replaced
-            return PlcReadResponse(PlcResponseCode.INTERNAL_ERROR, {})
-
-    async def _write(self, request: PlcWriteRequest) -> PlcWriteResponse:
-        """
-        Executes a PlcReadRequest
-        """
-        if self.device is None:
-            logging.error("No device is set in the mock connection!")
-            return self._default_failed_request(PlcResponseCode.NOT_CONNECTED)
-
-        try:
-            logging.debug("Sending read request to MockDevice")
-            response = PlcWriteResponse(
-                PlcResponseCode.OK,
-                {
-                    tag_name: self.device.write(tag)
-                    for tag_name, tag in request.tags.items()
-                },
-            )
-            return response
-        except Exception as e:
-            # TODO:- This exception is very general and probably should be replaced
-            return PlcWriteResponse(PlcResponseCode.INTERNAL_ERROR, request.tags)
-
-    def is_read_supported(self) -> bool:
-        """
-        Indicates if the connection supports read requests.
-        :return: True if connection supports reading, False otherwise
-        """
-        return True
-
-    def is_write_supported(self) -> bool:
-        """
-        Indicates if the connection supports write requests.
-        :return: True if connection supports writing, False otherwise
-        """
-        return False
-
-    def is_subscribe_supported(self) -> bool:
-        """
-        Indicates if the connection supports subscription requests.
-        :return: True if connection supports subscriptions, False otherwise
-        """
-        return False
-
-    def is_browse_supported(self) -> bool:
-        """
-        Indicates if the connection supports browsing requests.
-        :return: True if connection supports browsing, False otherwise
-        """
-        return False
 
 
 class MockDriver(PlcDriver):

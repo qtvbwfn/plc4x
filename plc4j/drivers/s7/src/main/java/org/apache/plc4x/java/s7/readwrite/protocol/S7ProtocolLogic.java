@@ -618,12 +618,19 @@ public class S7ProtocolLogic extends Plc4xProtocolBase<TPKTPacket> {
         short errorClass = 0;
         short errorCode = 0;
         if (responseMessage instanceof S7MessageUserData) {
-            // TODO: Payload and messageUserData are ignored?
-            //S7MessageUserData messageUserData = (S7MessageUserData) responseMessage;
+            S7MessageUserData messageUserData = (S7MessageUserData) responseMessage;
+            S7Parameter s7Parameter = messageUserData.getParameter();
+            if(s7Parameter instanceof S7ParameterUserData) {
+                S7ParameterUserData s7ParameterUserData = (S7ParameterUserData) s7Parameter;
+                S7ParameterUserDataItem s7ParameterUserDataItem = s7ParameterUserData.getItems().get(0);
+                if(s7ParameterUserDataItem instanceof S7ParameterUserDataItemCPUFunctions) {
+                    S7ParameterUserDataItemCPUFunctions s7ParameterUserDataItemCPUFunctions = (S7ParameterUserDataItemCPUFunctions) s7ParameterUserDataItem;
+                    errorCode = s7ParameterUserDataItemCPUFunctions.getErrorCode().shortValue();
+                }
+            }
             //S7PayloadUserData payload = (S7PayloadUserData) messageUserData.getPayload();
-            // errorClass = payload.getItems()[0].
-            // errorCode = messageUserData.getParameter().
-
+            //errorClass = payload.getItems()[0]
+            //errorCode = messageUserData.getParameter().
         } else if (responseMessage instanceof S7MessageResponse) {
             S7MessageResponse messageResponse = (S7MessageResponse) responseMessage;
             errorClass = messageResponse.getErrorClass();
@@ -639,7 +646,18 @@ public class S7ProtocolLogic extends Plc4xProtocolBase<TPKTPacket> {
                 logger.warn("Got an error response from the PLC. This particular response code usually indicates " +
                     "that PUT/GET is not enabled on the PLC.");
                 for (String tagName : plcSubscriptionRequest.getTagNames()) {
-                    values.put(tagName, null);
+                    values.put(tagName, new ResponseItem<>(PlcResponseCode.REMOTE_ERROR, null));
+                }
+                return new DefaultPlcSubscriptionResponse(plcSubscriptionRequest, values);
+            }
+            // This seems to be the case if we're trying to do a subscription on a device that doesn't support that.
+            else if((errorClass == 0) && (errorCode == (short) 0x8104)) {
+                logger.warn("Got an error response from the PLC. This particular response code usually indicates " +
+                    "that a given service is not implemented on the PLC. Most probably you tried to subscribe to " +
+                    "data on a PLC that doesn't support subsciptions (S7-1200 or S7-1500)",
+                    errorClass, errorCode);
+                for (String tagName : plcSubscriptionRequest.getTagNames()) {
+                    values.put(tagName, new ResponseItem<>(PlcResponseCode.UNSUPPORTED, null));
                 }
                 return new DefaultPlcSubscriptionResponse(plcSubscriptionRequest, values);
             } else {
@@ -649,7 +667,7 @@ public class S7ProtocolLogic extends Plc4xProtocolBase<TPKTPacket> {
                         "containing a capture of the communication.",
                     errorClass, errorCode);
                 for (String tagName : plcSubscriptionRequest.getTagNames()) {
-                    values.put(tagName, null);
+                    values.put(tagName, new ResponseItem<>(PlcResponseCode.INTERNAL_ERROR, null));
                 }
                 return new DefaultPlcSubscriptionResponse(plcSubscriptionRequest, values);
             }
@@ -1692,6 +1710,15 @@ public class S7ProtocolLogic extends Plc4xProtocolBase<TPKTPacket> {
                     values.put(tagName, result);
                 }
                 return new DefaultPlcReadResponse(plcReadRequest, values);
+            } else if ((errorClass == 0x85) && (errorCode == 0)) {
+                logger.warn("Got an error response from the PLC. This particular response code usually indicates " +
+                    "that we sent a too large packet or would be receiving a too large one. " +
+                    "Please report this, as this is most probably a bug.");
+                for (String tagName : plcReadRequest.getTagNames()) {
+                    ResponseItem<PlcValue> result = new ResponseItem<>(PlcResponseCode.ACCESS_DENIED, new PlcNull());
+                    values.put(tagName, result);
+                }
+                return new DefaultPlcReadResponse(plcReadRequest, values);
             } else {
                 logger.warn("Got an unknown error response from the PLC. Error Class: {}, Error Code {}. " +
                         "We probably need to implement explicit handling for this, so please file a bug-report " +
@@ -1706,18 +1733,7 @@ public class S7ProtocolLogic extends Plc4xProtocolBase<TPKTPacket> {
             }
         }
 
-        //TODO: Reassembling message.
-        if (responseMessage instanceof S7MessageResponseData) {
-            for (String tagName : plcReadRequest.getTagNames()) {
-                if (plcReadRequest.getTag(tagName) instanceof S7StringVarLengthTag) {
-                    PlcValue plcValue = null;
-                    PlcResponseCode responseCode = PlcResponseCode.INTERNAL_ERROR;
-                    ResponseItem<PlcValue> result = new ResponseItem<>(responseCode, plcValue);
-                    values.put(tagName, result);
-                }
-            }
-        } else if (responseMessage instanceof S7MessageUserData) {
-
+        if (responseMessage instanceof S7MessageUserData) {
             S7PayloadUserData payload = (S7PayloadUserData) responseMessage.getPayload();
             if (plcReadRequest.getNumberOfTags() != payload.getItems().size()) {
                 throw new PlcProtocolException(
@@ -1895,6 +1911,14 @@ public class S7ProtocolLogic extends Plc4xProtocolBase<TPKTPacket> {
                     "that PUT/GET is not enabled on the PLC.");
                 for (String tagName : plcWriteRequest.getTagNames()) {
                     responses.put(tagName, PlcResponseCode.ACCESS_DENIED);
+                }
+                return new DefaultPlcWriteResponse(plcWriteRequest, responses);
+            } else if ((errorClass == 0x85) && (errorCode == 0)) {
+                logger.warn("Got an error response from the PLC. This particular response code usually indicates " +
+                    "that we sent a too large packet or would be receiving a too large one. " +
+                    "Please report this, as this is most probably a bug.");
+                for (String tagName : plcWriteRequest.getTagNames()) {
+                    responses.put(tagName, PlcResponseCode.INTERNAL_ERROR);
                 }
                 return new DefaultPlcWriteResponse(plcWriteRequest, responses);
             } else {

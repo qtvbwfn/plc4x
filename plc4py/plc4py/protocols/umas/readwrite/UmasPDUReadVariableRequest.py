@@ -23,8 +23,8 @@ from plc4py.api.exceptions.exceptions import PlcRuntimeException
 from plc4py.api.exceptions.exceptions import SerializationException
 from plc4py.api.messages.PlcMessage import PlcMessage
 from plc4py.protocols.umas.readwrite.UmasPDUItem import UmasPDUItem
-from plc4py.protocols.umas.readwrite.VariableRequestReference import (
-    VariableRequestReference,
+from plc4py.protocols.umas.readwrite.VariableReadRequestReference import (
+    VariableReadRequestReference,
 )
 from plc4py.spi.generation.ReadBuffer import ReadBuffer
 from plc4py.spi.generation.WriteBuffer import WriteBuffer
@@ -39,14 +39,14 @@ import math
 class UmasPDUReadVariableRequest(UmasPDUItem):
     crc: int
     variable_count: int
-    variables: List[VariableRequestReference]
+    variables: List[VariableReadRequestReference]
     # Arguments.
     byte_length: int
     # Accessors for discriminator values.
     umas_function_key: ClassVar[int] = 0x22
     umas_request_function_key: ClassVar[int] = 0
 
-    def serialize_umas_pdu_item_child(self, write_buffer: WriteBuffer):
+    def serialize_umas_pduitem_child(self, write_buffer: WriteBuffer):
         write_buffer.push_context("UmasPDUReadVariableRequest")
 
         # Simple Field (crc)
@@ -97,7 +97,7 @@ class UmasPDUReadVariableRequest(UmasPDUItem):
         )
 
         variable_count: int = read_buffer.read_unsigned_byte(
-            logical_name="variableCount",
+            logical_name="variable_count",
             bit_length=8,
             byte_order=ByteOrder.LITTLE_ENDIAN,
             umas_request_function_key=umas_request_function_key,
@@ -106,7 +106,7 @@ class UmasPDUReadVariableRequest(UmasPDUItem):
 
         variables: List[Any] = read_buffer.read_array_field(
             logical_name="variables",
-            read_function=VariableRequestReference.static_parse,
+            read_function=VariableReadRequestReference.static_parse,
             count=variable_count,
             byte_order=ByteOrder.LITTLE_ENDIAN,
             umas_request_function_key=umas_request_function_key,
@@ -151,12 +151,12 @@ class UmasPDUReadVariableRequest(UmasPDUItem):
 class UmasPDUReadVariableRequestBuilder:
     crc: int
     variable_count: int
-    variables: List[VariableRequestReference]
+    variables: List[VariableReadRequestReference]
 
     def build(self, byte_length: int, pairing_key) -> UmasPDUReadVariableRequest:
-        umas_pdu_read_variable_request: UmasPDUReadVariableRequest = (
+        umas_pduread_variable_request: UmasPDUReadVariableRequest = (
             UmasPDUReadVariableRequest(
                 byte_length, pairing_key, self.crc, self.variable_count, self.variables
             )
         )
-        return umas_pdu_read_variable_request
+        return umas_pduread_variable_request

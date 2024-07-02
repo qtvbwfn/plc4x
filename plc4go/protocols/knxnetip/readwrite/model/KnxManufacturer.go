@@ -707,7 +707,7 @@ const (
 	KnxManufacturer_M_ARKLYFE                                            KnxManufacturer = 661
 	KnxManufacturer_M_FOSHAN_HAYDN_TECHNOLOGY_LIGHTING_CO__LTD_          KnxManufacturer = 662
 	KnxManufacturer_M_KNXES_COMPANY_LIMITED                              KnxManufacturer = 663
-	KnxManufacturer_M_THE_AKUVOX_COMPANY                                 KnxManufacturer = 664
+	KnxManufacturer_M_AKUVOX                                             KnxManufacturer = 664
 	KnxManufacturer_M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_    KnxManufacturer = 665
 	KnxManufacturer_M_SHENZHEN_HAIZHICHUANG_TECHNOLOGY_CO___LTD          KnxManufacturer = 666
 	KnxManufacturer_M_SHENZHEN_EASYDETEK_TECHNOLOGY_CO_LTD               KnxManufacturer = 667
@@ -717,8 +717,11 @@ const (
 	KnxManufacturer_M_CREATROL                                           KnxManufacturer = 671
 	KnxManufacturer_M_EUTELSAT                                           KnxManufacturer = 672
 	KnxManufacturer_M_TECNIKABEL                                         KnxManufacturer = 673
-	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 674
-	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 675
+	KnxManufacturer_M_ATIOS_AG                                           KnxManufacturer = 674
+	KnxManufacturer_M_SMARTLICHT                                         KnxManufacturer = 675
+	KnxManufacturer_M_BEIJING_BEVONE_ELECTRIC_CO__LTD_                   KnxManufacturer = 676
+	KnxManufacturer_M_ABB___RESERVED                                     KnxManufacturer = 677
+	KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED                    KnxManufacturer = 678
 )
 
 var KnxManufacturerValues []KnxManufacturer
@@ -1390,7 +1393,7 @@ func init() {
 		KnxManufacturer_M_ARKLYFE,
 		KnxManufacturer_M_FOSHAN_HAYDN_TECHNOLOGY_LIGHTING_CO__LTD_,
 		KnxManufacturer_M_KNXES_COMPANY_LIMITED,
-		KnxManufacturer_M_THE_AKUVOX_COMPANY,
+		KnxManufacturer_M_AKUVOX,
 		KnxManufacturer_M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_,
 		KnxManufacturer_M_SHENZHEN_HAIZHICHUANG_TECHNOLOGY_CO___LTD,
 		KnxManufacturer_M_SHENZHEN_EASYDETEK_TECHNOLOGY_CO_LTD,
@@ -1400,6 +1403,9 @@ func init() {
 		KnxManufacturer_M_CREATROL,
 		KnxManufacturer_M_EUTELSAT,
 		KnxManufacturer_M_TECNIKABEL,
+		KnxManufacturer_M_ATIOS_AG,
+		KnxManufacturer_M_SMARTLICHT,
+		KnxManufacturer_M_BEIJING_BEVONE_ELECTRIC_CO__LTD_,
 		KnxManufacturer_M_ABB___RESERVED,
 		KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED,
 	}
@@ -3965,10 +3971,22 @@ func (e KnxManufacturer) Number() uint16 {
 		}
 	case 674:
 		{ /* '674' */
-			return 43954
+			return 732
 		}
 	case 675:
 		{ /* '675' */
+			return 733
+		}
+	case 676:
+		{ /* '676' */
+			return 734
+		}
+	case 677:
+		{ /* '677' */
+			return 43954
+		}
+	case 678:
+		{ /* '678' */
 			return 43959
 		}
 	case 68:
@@ -6643,7 +6661,7 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 664:
 		{ /* '664' */
-			return "The Akuvox Company"
+			return "Akuvox"
 		}
 	case 665:
 		{ /* '665' */
@@ -6687,10 +6705,22 @@ func (e KnxManufacturer) Name() string {
 		}
 	case 674:
 		{ /* '674' */
-			return "ABB - reserved"
+			return "Atios AG"
 		}
 	case 675:
 		{ /* '675' */
+			return "SmartLicht"
+		}
+	case 676:
+		{ /* '676' */
+			return "Beijing Bevone Electric Co. Ltd."
+		}
+	case 677:
+		{ /* '677' */
+			return "ABB - reserved"
+		}
+	case 678:
+		{ /* '678' */
 			return "Busch-Jaeger Elektro - reserved"
 		}
 	case 68:
@@ -8107,7 +8137,7 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 663:
 		return KnxManufacturer_M_KNXES_COMPANY_LIMITED, true
 	case 664:
-		return KnxManufacturer_M_THE_AKUVOX_COMPANY, true
+		return KnxManufacturer_M_AKUVOX, true
 	case 665:
 		return KnxManufacturer_M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_, true
 	case 666:
@@ -8129,8 +8159,14 @@ func KnxManufacturerByValue(value uint16) (enum KnxManufacturer, ok bool) {
 	case 673:
 		return KnxManufacturer_M_TECNIKABEL, true
 	case 674:
-		return KnxManufacturer_M_ABB___RESERVED, true
+		return KnxManufacturer_M_ATIOS_AG, true
 	case 675:
+		return KnxManufacturer_M_SMARTLICHT, true
+	case 676:
+		return KnxManufacturer_M_BEIJING_BEVONE_ELECTRIC_CO__LTD_, true
+	case 677:
+		return KnxManufacturer_M_ABB___RESERVED, true
+	case 678:
 		return KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED, true
 	case 68:
 		return KnxManufacturer_M_WAREMA_RENKHOFF_SE, true
@@ -9464,8 +9500,8 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_FOSHAN_HAYDN_TECHNOLOGY_LIGHTING_CO__LTD_, true
 	case "M_KNXES_COMPANY_LIMITED":
 		return KnxManufacturer_M_KNXES_COMPANY_LIMITED, true
-	case "M_THE_AKUVOX_COMPANY":
-		return KnxManufacturer_M_THE_AKUVOX_COMPANY, true
+	case "M_AKUVOX":
+		return KnxManufacturer_M_AKUVOX, true
 	case "M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_":
 		return KnxManufacturer_M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_, true
 	case "M_SHENZHEN_HAIZHICHUANG_TECHNOLOGY_CO___LTD":
@@ -9486,6 +9522,12 @@ func KnxManufacturerByName(value string) (enum KnxManufacturer, ok bool) {
 		return KnxManufacturer_M_EUTELSAT, true
 	case "M_TECNIKABEL":
 		return KnxManufacturer_M_TECNIKABEL, true
+	case "M_ATIOS_AG":
+		return KnxManufacturer_M_ATIOS_AG, true
+	case "M_SMARTLICHT":
+		return KnxManufacturer_M_SMARTLICHT, true
+	case "M_BEIJING_BEVONE_ELECTRIC_CO__LTD_":
+		return KnxManufacturer_M_BEIJING_BEVONE_ELECTRIC_CO__LTD_, true
 	case "M_ABB___RESERVED":
 		return KnxManufacturer_M_ABB___RESERVED, true
 	case "M_BUSCH_JAEGER_ELEKTRO___RESERVED":
@@ -10883,8 +10925,8 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_FOSHAN_HAYDN_TECHNOLOGY_LIGHTING_CO__LTD_"
 	case KnxManufacturer_M_KNXES_COMPANY_LIMITED:
 		return "M_KNXES_COMPANY_LIMITED"
-	case KnxManufacturer_M_THE_AKUVOX_COMPANY:
-		return "M_THE_AKUVOX_COMPANY"
+	case KnxManufacturer_M_AKUVOX:
+		return "M_AKUVOX"
 	case KnxManufacturer_M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_:
 		return "M_NINGBO_YINZHOU_SHENGRUIJIE_ELECTRONICS_CO__LTD_"
 	case KnxManufacturer_M_SHENZHEN_HAIZHICHUANG_TECHNOLOGY_CO___LTD:
@@ -10905,6 +10947,12 @@ func (e KnxManufacturer) PLC4XEnumName() string {
 		return "M_EUTELSAT"
 	case KnxManufacturer_M_TECNIKABEL:
 		return "M_TECNIKABEL"
+	case KnxManufacturer_M_ATIOS_AG:
+		return "M_ATIOS_AG"
+	case KnxManufacturer_M_SMARTLICHT:
+		return "M_SMARTLICHT"
+	case KnxManufacturer_M_BEIJING_BEVONE_ELECTRIC_CO__LTD_:
+		return "M_BEIJING_BEVONE_ELECTRIC_CO__LTD_"
 	case KnxManufacturer_M_ABB___RESERVED:
 		return "M_ABB___RESERVED"
 	case KnxManufacturer_M_BUSCH_JAEGER_ELEKTRO___RESERVED:

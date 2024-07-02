@@ -17,24 +17,20 @@
 # under the License.
 #
 import asyncio
-import logging
-from typing import Type, Awaitable
+from typing import Type
 
 import plc4py
 from plc4py.api.PlcConnection import PlcConnection, PlcConnectionMetaData
 from plc4py.api.PlcDriver import PlcDriver
 from plc4py.api.authentication.PlcAuthentication import PlcAuthentication
-from plc4py.api.messages.PlcResponse import (
-    PlcResponse,
-    PlcReadResponse,
-    PlcWriteResponse,
-    PlcTagResponse,
-)
 from plc4py.api.messages.PlcRequest import (
     ReadRequestBuilder,
     PlcRequest,
     PlcReadRequest,
     PlcWriteRequest,
+)
+from plc4py.api.messages.PlcResponse import (
+    PlcResponse,
 )
 from plc4py.api.value.PlcValue import PlcResponseCode
 from plc4py.drivers.PlcDriverLoader import PlcDriverLoader
@@ -42,26 +38,46 @@ from plc4py.drivers.modbus.ModbusConfiguration import ModbusConfiguration
 from plc4py.drivers.modbus.ModbusDevice import ModbusDevice
 from plc4py.drivers.modbus.ModbusProtocol import ModbusProtocol
 from plc4py.drivers.modbus.ModbusTag import ModbusTagBuilder
-from plc4py.spi.messages.PlcReader import PlcReader
+from plc4py.spi.messages.PlcReader import DefaultPlcReader
 from plc4py.spi.messages.PlcRequest import DefaultReadRequestBuilder
-from plc4py.spi.messages.PlcWriter import PlcWriter
+from plc4py.spi.messages.PlcWriter import DefaultPlcWriter
 from plc4py.spi.transport.Plc4xBaseTransport import Plc4xBaseTransport
 from plc4py.spi.transport.TCPTransport import TCPTransport
 
 
-class ModbusConnection(PlcConnection, PlcReader, PlcWriter, PlcConnectionMetaData):
+class ModbusConnection(PlcConnection, DefaultPlcReader, DefaultPlcWriter):
     """
     Modbus TCP PLC connection implementation
     """
 
+    """
+    Initialization of ModbusConnection object
+
+    :param config: Modbus configuration object
+    :param transport: Plc4xBaseTransport object used for the TCP connection
+    """
+
     def __init__(self, config: ModbusConfiguration, transport: Plc4xBaseTransport):
+        """
+        Initializes a ModbusConnection object
+
+        :param config: Modbus configuration object
+        :param transport: Plc4xBaseTransport object used for the TCP connection
+        """
         super().__init__(config)
-        self._configuration: ModbusConfiguration
+        self._configuration: ModbusConfiguration = config
+        """
+        ModbusDevice object that encapsulates the PLC device configuration
+        and provides methods for device related operations
+        """
         self._device: ModbusDevice = ModbusDevice(self._configuration)
+        """
+        Plc4xBaseTransport object used for the TCP connection
+        """
         self._transport: Plc4xBaseTransport = transport
 
     @staticmethod
-    async def create(url: str):
+    async def create(url: str) -> "ModbusConnection":
         """
         Static Factory to return an instance of a ModbusConnection.
         It creates the TCP connection to the Modbus device before returning.
@@ -69,42 +85,33 @@ class ModbusConnection(PlcConnection, PlcReader, PlcWriter, PlcConnectionMetaDat
         :param url: PLC4X connection string of the Modbus TCP connection
         :return ModbusConnection instance using the configuration from the url provided
         """
+        # Extract configuration from the given url
         config = ModbusConfiguration(url)
+        # Create a future to manage the creation of the TCP connection
         loop = asyncio.get_running_loop()
         connection_future = loop.create_future()
-        transport = await asyncio.wait_for(
-            TCPTransport.create(
-                protocol_factory=lambda: ModbusProtocol(connection_future),
-                host=config.host,
-                port=config.port,
-            ),
-            10,
-        )
+        # Create the TCP connection to the Modbus device.
+        # The creation process is asynchronous and takes up to 10 seconds.
+        # If the creation fails, the Future is cancelled.
+        try:
+            transport = await asyncio.wait_for(
+                TCPTransport.create(
+                    protocol_factory=lambda: ModbusProtocol(connection_future),
+                    host=config.host,
+                    port=config.port,
+                ),
+                10,
+            )
+        except asyncio.TimeoutError:
+            # If the creation times out, cancel the Future
+            connection_future.cancel()
+            raise ValueError(
+                f"Failed to connect to {url} in 10 seconds. "
+                "Please check the PLC device is running and the connection string is correct."
+            )
+        # If the creation succeeds, return a ModbusConnection object
+        # using the configuration from the url provided and the transport
         return ModbusConnection(config, transport)
-
-    def is_connected(self) -> bool:
-        """
-        Indicates if the connection is established to a remote PLC.
-        :return: True if connection, False otherwise
-        """
-        if self._transport is not None:
-            return not self._transport.is_closing()
-        else:
-            return False
-
-    def close(self) -> None:
-        """
-        Closes the connection to the remote PLC.
-        :return:
-        """
-        if self._transport is not None:
-            self._transport.close()
-
-    def read_request_builder(self) -> ReadRequestBuilder:
-        """
-        :return: read request builder.
-        """
-        return DefaultReadRequestBuilder(ModbusTagBuilder)
 
     async def execute(self, request: PlcRequest) -> PlcResponse:
         """
@@ -117,76 +124,17 @@ class ModbusConnection(PlcConnection, PlcReader, PlcWriter, PlcConnectionMetaDat
 
         if isinstance(request, PlcReadRequest):
             return await self._read(request)
+
         elif isinstance(request, PlcWriteRequest):
             return await self._write(request)
 
         return self._default_failed_request(PlcResponseCode.NOT_CONNECTED)
 
-    def _check_connection(self) -> bool:
-        return self._device is None
-
-    async def _read(self, request: PlcReadRequest) -> PlcReadResponse:
+    def read_request_builder(self) -> ReadRequestBuilder:
         """
-        Executes a PlcReadRequest
+        :return: read request builder.
         """
-        if self._check_connection():
-            logging.error("No device is set in the modbus connection!")
-            return self._default_failed_request(PlcResponseCode.NOT_CONNECTED)
-        try:
-            logging.debug("Sending read request to Modbus Device")
-            response = await asyncio.wait_for(
-                self._device.read(request, self._transport), 5
-            )
-            return response
-        except Exception:
-            # TODO:- This exception is very general and probably should be replaced
-            return PlcReadResponse(PlcResponseCode.INTERNAL_ERROR, {})
-
-    async def _write(self, request: PlcWriteRequest) -> PlcTagResponse:
-        """
-        Executes a PlcWriteRequest
-        """
-        if self._check_connection():
-            logging.error("No device is set in the modbus connection!")
-            return self._default_failed_request(PlcResponseCode.NOT_CONNECTED)
-
-        try:
-            logging.debug("Sending write request to Modbus Device")
-            response = await asyncio.wait_for(
-                self._device.write(request, self._transport), 5
-            )
-            return response
-        except Exception:
-            # TODO:- This exception is very general and probably should be replaced
-            return PlcWriteResponse(PlcResponseCode.INTERNAL_ERROR, {})
-
-    def is_read_supported(self) -> bool:
-        """
-        Indicates if the connection supports read requests.
-        :return: True if connection supports reading, False otherwise
-        """
-        return True
-
-    def is_write_supported(self) -> bool:
-        """
-        Indicates if the connection supports write requests.
-        :return: True if connection supports writing, False otherwise
-        """
-        return False
-
-    def is_subscribe_supported(self) -> bool:
-        """
-        Indicates if the connection supports subscription requests.
-        :return: True if connection supports subscriptions, False otherwise
-        """
-        return False
-
-    def is_browse_supported(self) -> bool:
-        """
-        Indicates if the connection supports browsing requests.
-        :return: True if connection supports browsing, False otherwise
-        """
-        return False
+        return DefaultReadRequestBuilder(ModbusTagBuilder)
 
 
 class ModbusDriver(PlcDriver):
@@ -195,11 +143,25 @@ class ModbusDriver(PlcDriver):
         self.protocol_code = "modbus-tcp"
         self.protocol_name = "Modbus TCP"
 
+    """
+    Creates a new PlcConnection instance using the given URL.
+
+    This method is an asynchronous entry point to connect to a PLC using the Modbus TCP protocol.
+    It takes a URL (e.g. "tcp://<ip address>:<port>") as input and an optional PlcAuthentication instance.
+    The authentication instance is used to authenticate the connection. If it is not provided, the connection will
+    be attempted without authentication.
+
+    :param url: URL of the PLC to connect to (e.g. "tcp://<ip address>:<port>")
+    :param authentication: Optional PlcAuthentication instance used to authenticate the connection.
+    :return: An instance of PlcConnection that is connected to the PLC
+    """
+
     async def get_connection(
         self, url: str, authentication: PlcAuthentication = PlcAuthentication()
     ) -> PlcConnection:
         """
         Connects to a PLC using the given plc connection string.
+
         :param url: plc connection string
         :param authentication: authentication credentials.
         :return PlcConnection: PLC Connection object
@@ -215,9 +177,23 @@ class ModbusDriverLoader(PlcDriverLoader):
     @staticmethod
     @plc4py.hookimpl
     def get_driver() -> Type[ModbusDriver]:
+        """
+        Returns the ModbusDriver class used to instantiate Modbus plc drivers.
+
+        This method is an entry point for pluggy to load the Modbus driver.
+
+        :return Type[ModbusDriver]: ModbusDriver class used to instantiate Modbus plc drivers
+        """
         return ModbusDriver
 
     @staticmethod
     @plc4py.hookimpl
     def key() -> str:
+        """
+        Returns the unique key for the Modbus driver.
+
+        The key is used by PlcDriverManager to identify the driver.
+
+        :return str: Unique key for the Modbus driver
+        """
         return "modbus"
