@@ -17,19 +17,43 @@
  * under the License.
  */
 
-package model
+package utils
 
 import (
-	"context"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-func Utf8LengthToPascalLength(_ context.Context, stringValue string) int32 {
-	if stringValue == "" {
-		return -1
+func TestRandomString(t *testing.T) {
+	type args struct {
+		length int
 	}
-	return int32(len(stringValue))
-}
-
-func PascalLengthToUtf8Length(_ context.Context, slength int32) int32 {
-	return max(slength, 0)
+	tests := []struct {
+		name       string
+		args       args
+		wantAssert func(t *testing.T, actual string) bool
+	}{
+		{
+			name: "simple test",
+			wantAssert: func(t *testing.T, actual string) bool {
+				return assert.Equal(t, 0, len(actual))
+			},
+		},
+		{
+			name: "fixed length",
+			args: args{length: 60},
+			wantAssert: func(t *testing.T, actual string) bool {
+				t.Log(actual)
+				return assert.Equal(t, 60, len(actual))
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := RandomString(tt.args.length)
+			if tt.wantAssert != nil {
+				assert.Truef(t, tt.wantAssert(t, got), "RandomString(%v)", tt.args.length)
+			}
+		})
+	}
 }

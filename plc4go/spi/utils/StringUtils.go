@@ -17,19 +17,29 @@
  * under the License.
  */
 
-package model
+package utils
 
 import (
-	"context"
+	"math/rand"
+	"time"
 )
 
-func Utf8LengthToPascalLength(_ context.Context, stringValue string) int32 {
-	if stringValue == "" {
-		return -1
+var alphabet []rune
+
+func init() {
+	offset := 'a' - 'A'
+	for i := range 26 {
+		r := rune(i + 'A')
+		alphabet = append(alphabet, r, r+offset)
 	}
-	return int32(len(stringValue))
 }
 
-func PascalLengthToUtf8Length(_ context.Context, slength int32) int32 {
-	return max(slength, 0)
+// RandomString returns a random string using the alphabet
+func RandomString(length int) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	randomString := make([]rune, length)
+	for i := range randomString {
+		randomString[i] = alphabet[r.Intn(len(alphabet))]
+	}
+	return string(randomString)
 }
